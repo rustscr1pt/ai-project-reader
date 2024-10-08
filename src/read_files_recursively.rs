@@ -1,12 +1,12 @@
 use walkdir::Error;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 use crate::is_ignored::is_ignored;
 
 pub fn read_files_recursively(
     folder_path : impl AsRef<Path>,
     ignored_directories_vec : &Vec<String>,
-    paths_buffer : &mut Vec<String>
+    paths_buffer : &mut Vec<PathBuf>
 ) -> Result<(), Error> {
     for entry in WalkDir::new(folder_path)
         .into_iter()
@@ -16,7 +16,8 @@ pub fn read_files_recursively(
                 let path = entry.path();
                 println!("Allowed path is : {:?}", path);
                 if path.is_file() {
-                    println!("Found file : {:?}", path)
+                    println!("Found file : {:?}", path);
+                    paths_buffer.push(path.to_path_buf())
                 }
             }
             Err(err) => {
