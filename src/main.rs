@@ -1,30 +1,19 @@
-use std::io::stdin;
-use std::path::Path;
-use walkdir::WalkDir;
+mod fill_ignored_directories;
+mod read_files_recursively;
+mod is_ignored;
 
-fn read_files_recursively<P : AsRef<Path>>(folder_path : P) -> Result<(), String> {
-    for entry in WalkDir::new(folder_path) {
-        match entry {
-            Ok(entry) => {
-                let path = entry.path();
-                println!("The path is = {:?}", path);
-            }
-            Err(err) => {
-                println!("{}", err);
-                return Err(err.to_string())
-            }
-        }
-    }
-    return Ok(())
-}
+use crate::fill_ignored_directories::fill_ignored_directories;
+use crate::read_files_recursively::read_files_recursively;
 
 #[tokio::main]
 async fn main() -> () {
-    let mut path_to_project : String = String::new();
-    println!("Pass the path to your project");
-    match stdin().read_line(&mut path_to_project) {
-        Ok(_) => {
-            match read_files_recursively(path_to_project) {
+    let path_to_project : String = String::from(r#"C:\Users\User\RustroverProjects\ai-project-reader"#);
+    let mut ignored_directories_vec : Vec<String> = Vec::new();
+    let mut paths_buffer : Vec<String> = Vec::new();
+    match fill_ignored_directories(&mut ignored_directories_vec) {
+        Ok(()) => {
+            println!("Successfully read .readignore file : {:?}", ignored_directories_vec);
+            match read_files_recursively(path_to_project.trim(), &ignored_directories_vec, &mut paths_buffer) {
                 Ok(()) => {
 
                 }
@@ -34,7 +23,15 @@ async fn main() -> () {
             }
         }
         Err(err) => {
-            println!("{}", err)
+            println!("Error when trying to read .readerignore\n{}", err);
+            match read_files_recursively(path_to_project.trim(), &ignored_directories_vec, &mut paths_buffer) {
+                Ok(()) => {
+
+                }
+                Err(err) => {
+                    println!("{}", err)
+                }
+            }
         }
     }
 }
