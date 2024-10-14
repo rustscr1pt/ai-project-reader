@@ -16,6 +16,7 @@ pub fn read_path_to_project() -> Result<String, Error> {
                     }
                 }
             }
+            println!("{}", buffer);
             return Ok(buffer)
         }
         Err(err) => {
