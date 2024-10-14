@@ -3,6 +3,7 @@ mod read_files_recursively;
 mod is_ignored;
 mod read_file_to_buffer;
 mod copy_to_clipboard;
+mod read_path_to_project;
 
 use std::path::PathBuf;
 use crate::copy_to_clipboard::copy_to_clipboard;
